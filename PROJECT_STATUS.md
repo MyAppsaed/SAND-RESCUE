@@ -12,6 +12,9 @@ The repository is a Unity 6.0 project scaffold and has been published to GitHub.
 - A SANID silver expedition visual prototype has a body plus four separate wheel meshes with provisional axle pivots.
 - The prototype FBX and its four material maps are under Assets/SandRescue/Art/Vehicles/Vehicle01.
 - A Tools/SAND RESCUE menu command exists to create starter mission assets when run inside Unity; those ScriptableObject assets have not been created here.
+- A separate Create First Drive Test Scene command is prepared to generate the driving rig, camera, URP assets if needed, prefab and flat test scene inside Unity. It has not been run here.
+- FirstDriveHUD provides a desktop-only smoke-test overlay, not the production/mobile/localized UI.
+- The redundant standalone TextMeshPro package request and the handcrafted incomplete dependency lock were removed. Unity will resolve and regenerate the lock on import.
 
 ## Actual checks performed
 
@@ -20,6 +23,7 @@ The repository is a Unity 6.0 project scaffold and has been published to GitHub.
 - Original 13,457-triangle total preserved after separation.
 - Actual model preview inspected.
 - Targeted source checks and git diff --check.
+- A C# grammar parser checked 37 source files without syntax errors; this is not a Unity API/compiler check.
 
 ## Not completed or tested
 
@@ -33,4 +37,4 @@ The repository is a Unity 6.0 project scaffold and has been published to GitHub.
 
 Previous balanced-brace checks were only text sanity checks, not compilation. Opening the project in Unity is the next validation gate; stop on Console or package errors and fix them before testing the first mission.
 
-See Docs/Vehicle01/START_HERE.md and STEP2_SETUP.md for setup notes.
+See FIRST_DRIVE_GUIDE.md for the first-drive command. Docs/Vehicle01/START_HERE.md and STEP2_SETUP.md contain model and mission setup notes.
