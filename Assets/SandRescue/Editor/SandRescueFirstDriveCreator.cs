@@ -42,9 +42,9 @@ namespace SandRescue.Editor
                     EditorUtility.DisplayDialog("SAND RESCUE", "The imported model is missing " + name + ". Pull the separated-wheel update before continuing.", "OK");
                     return;
                 }
-            if (Find(model.transform, "Body") == null || Find(model.transform, "FrontWinchAnchor") == null || Find(model.transform, "RearTowAnchor") == null)
+            if (Find(model.transform, "Body") == null || Find(model.transform, "FrontWinchAnchor") == null || Find(model.transform, "RearTowAnchor") == null || Find(model.transform, "CenterOfMassSuggestion") == null)
             {
-                EditorUtility.DisplayDialog("SAND RESCUE", "The model is missing its body or orientation markers.", "OK");
+                EditorUtility.DisplayDialog("SAND RESCUE", "The model is missing its body or orientation markers, including CenterOfMassSuggestion.", "OK");
                 return;
             }
             if (GraphicsSettings.currentRenderPipeline != null && !(GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset))
@@ -113,7 +113,9 @@ namespace SandRescue.Editor
             GameObject visual = UnityEngine.Object.Instantiate(model, car.transform);
             visual.name = "SANID Visuals";
             visual.transform.localPosition = Vector3.zero;
-            visual.transform.localRotation = Quaternion.identity;
+            // Keep the FBX importer's authored root rotation and scale.
+            // Then solve the complete forward/up frame, not just a world-Y yaw.
+            AlignVehicleFrame(visual.transform, car.transform);
             foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true))
             {
                 Material[] slots = renderer.sharedMaterials;
@@ -121,13 +123,9 @@ namespace SandRescue.Editor
                 renderer.sharedMaterials = slots;
             }
             Bounds imported = RendererBounds(visual);
-            float length = Mathf.Max(imported.size.x, imported.size.z);
+            float length = imported.size.z; // Nose is now +Z and roof is +Y.
             if (length < 0.001f) throw new InvalidOperationException("The imported vehicle has zero visible extent.");
             visual.transform.localScale *= 4.9f / length;
-            Vector3 forward = Find(visual.transform, "FrontWinchAnchor").position - Find(visual.transform, "RearTowAnchor").position;
-            forward.y = 0f;
-            if (forward.sqrMagnitude < 0.01f) throw new InvalidOperationException("Orientation markers do not define a horizontal forward direction.");
-            visual.transform.rotation = Quaternion.FromToRotation(forward.normalized, Vector3.forward) * visual.transform.rotation;
             Bounds bounds = RendererBounds(visual);
             visual.transform.position += new Vector3(car.transform.position.x - bounds.center.x,
                 car.transform.position.y - bounds.min.y, car.transform.position.z - bounds.center.z);
@@ -198,6 +196,30 @@ namespace SandRescue.Editor
             filterData.ApplyModifiedPropertiesWithoutUndo();
             SetLayerRecursively(car.transform, VehicleLayer);
             return car;
+        }
+
+        private static void AlignVehicleFrame(Transform visual, Transform physicsRoot)
+        {
+            Vector3 fl = Find(visual, "Wheel_FL").position;
+            Vector3 fr = Find(visual, "Wheel_FR").position;
+            Vector3 rl = Find(visual, "Wheel_RL").position;
+            Vector3 rr = Find(visual, "Wheel_RR").position;
+            Vector3 forward = (fl + fr - rl - rr) * 0.5f;
+            Vector3 right = (fr + rr - fl - rl) * 0.5f;
+            Vector3 up = Vector3.Cross(forward, right);
+            if (forward.sqrMagnitude < 0.01f || up.sqrMagnitude < 0.01f)
+                throw new InvalidOperationException("The four wheel pivots do not define a usable vehicle frame.");
+
+            // The source's mass marker is above its wheel plane. Use it only to
+            // select the roof side; its provisional physics position is not assumed.
+            Vector3 wheelCenter = (fl + fr + rl + rr) * 0.25f;
+            Vector3 roofSide = Find(visual, "CenterOfMassSuggestion").position - wheelCenter;
+            if (Vector3.Dot(up, roofSide) < 0f) up = -up;
+            if (Vector3.Dot(up.normalized, roofSide) < 0.05f)
+                throw new InvalidOperationException("The roof-side marker is too close to the wheel plane.");
+            Quaternion importedFrame = Quaternion.LookRotation(forward.normalized, up.normalized);
+            Quaternion correction = physicsRoot.rotation * Quaternion.Inverse(importedFrame);
+            visual.rotation = correction * visual.rotation;
         }
 
         private static void CreateCamera(GameObject car)
