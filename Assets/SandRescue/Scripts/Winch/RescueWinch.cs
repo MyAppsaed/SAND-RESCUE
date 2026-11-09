@@ -25,6 +25,8 @@ namespace SandRescue
             if (distance > attachDistance || (point.Towable.RequiresHeavyWinch && !canUseHeavyWinch)) return false;
             ConnectedTarget = point.Towable; ConnectedTarget.SetTowed(true); CableLength = distance;
             if (cable != null) cable.SetEndpoints(attachmentPoint, point.transform);
+            var rescueTarget = point.GetComponentInParent<RescueTarget>();
+            if (rescueTarget != null) rescueTarget.BeginRescue();
             MissionManager.Active?.ReportObjective(point.PointId, MissionObjectiveType.AttachWinch, gameObject);
             return true;
         }
