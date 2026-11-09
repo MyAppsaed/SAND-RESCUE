@@ -10,7 +10,9 @@ namespace SandRescue
         private void OnTriggerEnter(Collider other)
         {
             if (State != RescueTargetState.RescueInProgress || destination == null) return;
-            if (other.attachedRigidbody == towable?.Body) CompleteRescue();
+            // The entering collider here belongs to the zone, not our own Rigidbody.
+            SafeZone enteredZone = other.GetComponentInParent<SafeZone>();
+            if (enteredZone == destination) CompleteRescue();
         }
         public override void BeginRescue() { base.BeginRescue(); if (towable != null) towable.SetTowed(true); }
     }

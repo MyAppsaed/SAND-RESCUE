@@ -1,0 +1,91 @@
+{
+  "source": "SANID_Vehicle_01_Prototype.blend",
+  "method": "Connected-region classification on a tolerance-welded analysis graph; original UVs/material references retained when separating mesh regions.",
+  "meshes": [
+    {
+      "name": "Wheel_FR",
+      "triangles": 786,
+      "pivot_blender_xyz_m": [
+        1.54384,
+        -0.98288,
+        0.44589
+      ]
+    },
+    {
+      "name": "Wheel_RR",
+      "triangles": 987,
+      "pivot_blender_xyz_m": [
+        -1.03082,
+        -0.89658,
+        0.46027
+      ]
+    },
+    {
+      "name": "Wheel_FL",
+      "triangles": 764,
+      "pivot_blender_xyz_m": [
+        1.50548,
+        0.94932,
+        0.45548
+      ]
+    },
+    {
+      "name": "Wheel_RL",
+      "triangles": 744,
+      "pivot_blender_xyz_m": [
+        -1.02123,
+        0.93014,
+        0.45548
+      ]
+    },
+    {
+      "name": "Body",
+      "triangles": 10176,
+      "pivot_blender_xyz_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "source_triangles": 13457,
+  "export_triangles": 13457,
+  "wheel_radius_estimates_m": {
+    "Wheel_FR": 0.44589,
+    "Wheel_RR": 0.45068,
+    "Wheel_FL": 0.44589,
+    "Wheel_RL": 0.44829
+  },
+  "coordinate_note": "Source model: nose +Blender X, up +Blender Z, left +Blender Y. FBX exported -Z forward / Y up; inspect Unity imported hierarchy and use the front marker to orient the visual root to controller +Z.",
+  "anchors": {
+    "FrontWinchAnchor": [
+      2.3,
+      0.0,
+      0.78
+    ],
+    "RearTowAnchor": [
+      -2.15,
+      0.0,
+      0.6
+    ],
+    "CenterOfMassSuggestion": [
+      0.1,
+      0.0,
+      0.85
+    ]
+  },
+  "anchor_note": "Markers are provisional scene setup aids, not physically verified connection points.",
+  "checks": [
+    "Exactly four wheel objects and one body object.",
+    "Wheel origins placed at tire bounding-box centers.",
+    "Total triangle count preserved.",
+    "Wheel geometry assigned without overlapping face regions."
+  ],
+  "remaining": [
+    "Not compiled or tested in Unity.",
+    "AI-generated wheel shapes and hubs need appearance review during rotation.",
+    "Exact SANID decal replacement still required.",
+    "No WheelColliders, Rigidbody, vehicle scripts, collision hulls or LODs included.",
+    "Unseen surfaces and any grille emblem artifacts remain to be cleaned."
+  ]
+}

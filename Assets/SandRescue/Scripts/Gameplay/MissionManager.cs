@@ -35,7 +35,9 @@ namespace SandRescue
             for (int i = 0; i < mission.objectives.Count; i++) progress.Add(new MissionObjectiveProgress { objectiveId = mission.objectives[i].objectiveId });
             return true;
         }
-        public bool StartAssignedMission() => StartMission(currentMission);
+        // Button.onClick requires a void-returning method.
+        public void StartAssignedMission() { StartMission(currentMission); }
+        public bool TryStartAssignedMission() => StartMission(currentMission);
         public void ReportObjective(string targetId, MissionObjectiveType type, GameObject actor)
         {
             if (!IsRunning || currentMission == null) return;

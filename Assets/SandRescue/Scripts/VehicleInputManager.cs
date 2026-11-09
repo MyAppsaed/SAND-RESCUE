@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace SandRescue
 {
+    [DefaultExecutionOrder(-100)]
     public class VehicleInputManager : MonoBehaviour
     {
         [Header("Sources")]
@@ -28,13 +29,18 @@ namespace SandRescue
         private void Update()
         {
             ReadInput();
-            Current.Throttle = Mathf.MoveTowards(Current.Throttle, targetThrottle, Time.deltaTime / inputSmoothing);
-            Current.Steering = Mathf.MoveTowards(Current.Steering, targetSteering, Time.deltaTime / inputSmoothing);
-            Current.Handbrake = targetHandbrake;
-            Current.RecoverPressed = recoverPressed;
-            Current.LookBack = lookBackPressed;
+            // A struct property returns a copy; update a local value, then publish it.
+            VehicleInputState state = Current;
+            float smoothing = Mathf.Max(0.01f, inputSmoothing);
+            state.Throttle = Mathf.MoveTowards(state.Throttle, targetThrottle, Time.deltaTime / smoothing);
+            state.Steering = Mathf.MoveTowards(state.Steering, targetSteering, Time.deltaTime / smoothing);
+            state.Handbrake = targetHandbrake;
+            state.RecoverPressed = recoverPressed;
+            state.LookBack = lookBackPressed;
+            Current = state;
             recoverPressed = false;
             lookBackPressed = false;
+            if (allowMobileInput && mobileInput != null) mobileInput.ClearMomentaryButtons();
         }
 
         private void ReadInput()

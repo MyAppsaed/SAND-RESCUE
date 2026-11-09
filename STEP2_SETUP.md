@@ -1,6 +1,6 @@
 # SAND RESCUE — Step 2 Setup and Validation
 
-Step 2 adds data-driven missions, rescue objectives, towing, checkpoints, safe zones, rewards, and the gameplay loop. Existing Step 1 vehicle scripts were preserved; only the surface enum was extended with `HardSand`.
+Step 2 adds source foundations for data-driven missions, rescue objectives, towing, checkpoints, safe zones, reward calculation, and gameplay flow. The vehicle controller remains in place. The subsequent vehicle-preparation pass applies targeted input/camera bug fixes and adds a separate-wheel visual prototype; see CHANGELOG_VEHICLE_PREP.md. This is not yet a Unity-validated completed gameplay loop.
 
 ## Scene hierarchy
 
@@ -31,6 +31,10 @@ On `MissionManager`, assign the player `VehicleStatus` and `CheckpointManager`. 
 On `RescueWinch`, assign the vehicle Rigidbody, front or rear connection transform, `WinchCableRenderer`, and tune maximum length, reel speed, winch force, and break force. On the cable object, add a `LineRenderer` and assign it to `WinchCableRenderer`. On each stranded vehicle, add `Rigidbody`, `TowableVehicle`, `StrandedVehicle`, and one or more `RescueConnectionPoint` components.
 
 A `MissionTrigger` reports progress when the player Rigidbody enters it. A `SafeZone` is a trigger collider and should be used as the destination for tow missions. A `CheckpointManager` registers checkpoint transforms through `Register(Transform)` from checkpoint trigger events or a small UI/scene event binding.
+
+For a mission-start UI button, bind the void `MissionManager.StartAssignedMission()` method. Code callers can use the bool `TryStartAssignedMission()` method instead. For attach UI, assign `RescueWinch.targetDetector` and bind the void `AttachNearestTarget()` method. A fixed-target test can bind the void `Attach(RescueConnectionPoint)` method with the target point in its argument slot. Do not bind the bool-returning `TryAttach` method to Button.onClick. The first mission's attachment point ID must be `stranded_car_front`; the rescued vehicle target ID must be `stranded_car_01`.
+
+On `StrandedVehicle`, assign its `Destination` to the exact SafeZone component. Entering that zone while rescue is in progress reports its TowTarget objective. The SafeZone separately reports ReachSafeZone when the player-controller Rigidbody enters, not when unrelated physics props enter. Reward calculation emits an event; persistent coins/experience storage is not implemented yet.
 
 ## Five starter mission assets
 

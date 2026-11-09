@@ -9,7 +9,11 @@ namespace SandRescue
         public UnityEvent<string, GameObject> OnVehicleEntered;
         private void OnTriggerEnter(Collider other)
         {
-            if (other.attachedRigidbody != null) OnVehicleEntered?.Invoke(zoneId, other.attachedRigidbody.gameObject);
+            Rigidbody body = other.attachedRigidbody;
+            if (body == null) return;
+            OnVehicleEntered?.Invoke(zoneId, body.gameObject);
+            if (body.GetComponent<SandRescueVehicleController>() != null)
+                MissionManager.Active?.ReportObjective(zoneId, MissionObjectiveType.ReachSafeZone, body.gameObject);
         }
     }
 }
