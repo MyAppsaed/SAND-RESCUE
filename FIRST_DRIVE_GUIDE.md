@@ -27,6 +27,8 @@ If no pipeline is configured, the command creates URP pipeline/renderer assets a
 
 If Unity says Cannot create a new scene additively with an untitled scene unsaved, close the error dialog and save the original scene with File > Save As under Assets. Then run the command again. Saving first also works with the existing builder version; the latest patch adds an early explanatory check before setup assets are created. No temporary test scene was created in this particular failure, even if the older dialog said one was closed.
 
+If setup says Unity could not activate the temporary test scene, fetch and pull the latest code while preserving local Unity changes. The updated builder accepts a valid loaded scene that is already active, attempts selection only when necessary, and then verifies the actual active scene before creating objects. It no longer treats the return value of a redundant SetActiveScene call as the sole success check. If the new check still fails, the error includes scene handles and the current active path; share that full error. The exact native cause of the earlier false return is not yet confirmed, and the patch requires a Unity retry.
+
 The command now builds in a temporary additive scene, keeping your original scenes open during construction. If an exception occurs before the new test scene is saved, it attempts to restore the prior active scene and render-pipeline assignments and close only the incomplete temporary scene. Existing scenes are closed only after the new prefab and scene have been saved, and only after the initial scene-save consent prompt.
 
 This is scene-level recovery, not a complete asset transaction. Partial generated files and texture import setting changes remain for inspection; existing asset files are not automatically deleted. If cleanup itself fails, or an error happens after the new scene was saved, the dialog tells you to stop and inspect the Console and open scenes rather than entering Play Mode. The recovery path still requires an actual Unity test.
@@ -55,6 +57,8 @@ The test does not include winch gameplay, mission UI, a garage, persistent curre
 
 The wheel-collider placement uses Unity's recommended half-suspension upward offset [1]. The URP setup uses the documented UniversalRenderPipelineAsset.Create API [2]. The package decision follows the official Unity UI 2.0 changelog [3]. Unity maintains the resolved package graph in its generated lockfile [4]. The current-scene save prompt uses the documented EditorSceneManager method [5].
 
+Unity documents the active scene as the destination for new scripted GameObjects and the source of lighting settings [6]. EditorSceneManager inherits SetActiveScene from SceneManager [7]; changing only the class qualifier is not a separate Editor activation implementation. NewScene returns a reference to the created scene and Additive preserves existing scenes [8].
+
 **References**
 
 [1]: https://docs.unity3d.com/6000.0/Documentation/Manual/WheelColliderTutorial.html "Unity 6 WheelCollider tutorial"
@@ -62,3 +66,6 @@ The wheel-collider placement uses Unity's recommended half-suspension upward off
 [3]: https://docs.unity3d.com/Packages/com.unity.ugui@2.0/changelog/CHANGELOG.html "Unity UI 2.0 TextMeshPro merge changelog"
 [4]: https://docs.unity3d.com/6000.0/Documentation/Manual/upm-conflicts-auto.html "Unity Package Manager lockfiles"
 [5]: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo.html "Unity Editor save-current-scenes prompt"
+[6]: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html "Unity 6 active-scene semantics"
+[7]: https://docs.unity.com/engine/6000.0/script-reference/unityeditor/scenemanagement/editorscenemanager "Unity 6 EditorSceneManager inherited methods"
+[8]: https://docs.unity.com/engine/6000.0/script-reference/unityeditor/scenemanagement/editorscenemanager/newscene "Unity 6 Editor new-scene API"

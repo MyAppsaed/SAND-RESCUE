@@ -90,8 +90,7 @@ namespace SandRescue.Editor
                 Material sand = CreateMaterial(folder + "/MAT_TestSand.mat", lit, new Color(0.61f, 0.48f, 0.29f));
                 Material marker = CreateMaterial(folder + "/MAT_TestMarker.mat", lit, new Color(0.95f, 0.43f, 0.1f));
                 testScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
-                if (!SceneManager.SetActiveScene(testScene))
-                    throw new InvalidOperationException("Unity could not activate the temporary test scene.");
+                EnsureActiveTestScene(testScene);
                 CreateEnvironment(sand, marker);
                 GameObject car = CreateVehicle(model, paint, wheelNames);
                 CreateCamera(car);
@@ -150,6 +149,21 @@ namespace SandRescue.Editor
                     "Setup failed: " + error.Message + "\n\n" + recoveryNote + "\nPartial generated assets and changed texture import settings are retained; no existing asset files were deleted. This is not a passing driving test.", "OK");
             }
 #endif
+        }
+
+        private static void EnsureActiveTestScene(Scene scene)
+        {
+            if (!scene.IsValid() || !scene.isLoaded)
+                throw new InvalidOperationException("The temporary test scene is not valid/loaded. Scene handle: " + scene.handle);
+
+            // Editor creation may have selected the scene already. Verify the
+            // actual active scene, not only the return value of a redundant call.
+            if (SceneManager.GetActiveScene() != scene)
+                SceneManager.SetActiveScene(scene);
+            Scene active = SceneManager.GetActiveScene();
+            if (active != scene)
+                throw new InvalidOperationException("The temporary scene still is not active after selection. Target handle: "
+                    + scene.handle + "; active handle: " + active.handle + "; active path: " + active.path);
         }
 
         private static GameObject CreateVehicle(GameObject model, Material material, string[] names)
