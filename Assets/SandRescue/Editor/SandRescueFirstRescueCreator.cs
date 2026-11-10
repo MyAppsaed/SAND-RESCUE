@@ -188,7 +188,7 @@ namespace SandRescue.Editor
 
             GameObject pointObject = new GameObject("Front Connection — " + PointId);
             pointObject.transform.SetParent(root.transform, false);
-            pointObject.localPosition = new Vector3(0f, 0.35f, 2.35f);
+            pointObject.transform.localPosition = new Vector3(0f, 0.35f, 2.35f);
             SphereCollider pointCollider = pointObject.AddComponent<SphereCollider>();
             pointCollider.isTrigger = true;
             pointCollider.radius = 0.55f;
