@@ -16,11 +16,17 @@ If the menu is missing, check the Console for compiler errors first. The setup c
 
 It creates a separate folder under Assets/SandRescue/Generated/FirstDrive. A repeated run selects a new unique folder rather than replacing an earlier generated scene or prefab.
 
-The scene uses the silver SANID expedition model with the existing vehicle controller, input manager, surface detector and recovery component. It aligns the vehicle's nose to the controller's forward direction using the model's front/rear markers. It adds a Rigidbody, a provisional body box collider and four WheelColliders. Tire radii use the imported vertical extent, avoiding tread-thickness assumptions. A test-only runtime filter explicitly ignores collision pairs between the hull and its wheels and between wheel pairs; the Ignore Raycast layer is used for sensor exclusion, not as a claim that physics collisions are disabled. Wheel visual wrappers preserve the model's authored orientation while the wheel physics supplies position, steering and rotation.
+The scene uses the silver SANID expedition model with the existing vehicle controller, input manager, surface detector and recovery component. It retains the imported root transform and derives a full forward/up frame from the four wheel pivots and the roof-side marker before sizing the vehicle. This replaces the earlier horizontal-only alignment that left the imported vehicle sideways. It adds a Rigidbody, a provisional body box collider and four WheelColliders. Tire radii use the corrected vertical extent, avoiding tread-thickness assumptions. A test-only runtime filter explicitly ignores collision pairs between the hull and its wheels and between wheel pairs; the Ignore Raycast layer is used for sensor exclusion, not as a claim that physics collisions are disabled. Wheel visual wrappers preserve the model's authored orientation while the wheel physics supplies position, steering and rotation.
 
 The environment is deliberately simple: a flat 120-metre test surface, six lane markers, a directional light and a follow camera. A desktop-only overlay shows speed in km/h and the controls. This is a driving smoke test, not a detailed desert map or a rescue mission.
 
 If no pipeline is configured, the command creates URP pipeline/renderer assets and assigns them as the default/current-quality pipeline. It does not deliberately replace a configured non-URP pipeline; that case stops with an explanation. It also sets the four vehicle textures' import types, color-space settings and initial maximum size to 1024. It does not change the source image pixels. Generated materials are assigned to the scene copy of the model, not remapped into the original FBX.
+
+## If setup stops with an error
+
+The command now builds in a temporary additive scene, keeping your original scenes open during construction. If an exception occurs before the new test scene is saved, it attempts to restore the prior active scene and render-pipeline assignments and close only the incomplete temporary scene. Existing scenes are closed only after the new prefab and scene have been saved, and only after the initial scene-save consent prompt.
+
+This is scene-level recovery, not a complete asset transaction. Partial generated files and texture import setting changes remain for inspection; existing asset files are not automatically deleted. If cleanup itself fails, or an error happens after the new scene was saved, the dialog tells you to stop and inspect the Console and open scenes rather than entering Play Mode. The recovery path still requires an actual Unity test.
 
 ## Controls
 

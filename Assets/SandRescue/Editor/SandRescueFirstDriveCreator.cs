@@ -57,6 +57,16 @@ namespace SandRescue.Editor
                 return;
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
+            // Keep the original scenes alive until the complete test has been saved.
+            Scene previousActive = SceneManager.GetActiveScene();
+            Scene[] previousScenes = new Scene[SceneManager.sceneCount];
+            for (int i = 0; i < previousScenes.Length; i++) previousScenes[i] = SceneManager.GetSceneAt(i);
+            UnityEngine.Object previousSelection = Selection.activeObject;
+            RenderPipelineAsset previousDefaultPipeline = GraphicsSettings.defaultRenderPipeline;
+            RenderPipelineAsset previousQualityPipeline = QualitySettings.renderPipeline;
+            Scene testScene = default(Scene);
+            bool sceneSaved = false;
+
             try
             {
                 EnsureFolder("Assets/SandRescue/Generated");
@@ -66,7 +76,9 @@ namespace SandRescue.Editor
                 Material paint = CreateVehicleMaterial(folder, lit);
                 Material sand = CreateMaterial(folder + "/MAT_TestSand.mat", lit, new Color(0.61f, 0.48f, 0.29f));
                 Material marker = CreateMaterial(folder + "/MAT_TestMarker.mat", lit, new Color(0.95f, 0.43f, 0.1f));
-                Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                testScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+                if (!SceneManager.SetActiveScene(testScene))
+                    throw new InvalidOperationException("Unity could not activate the temporary test scene.");
                 CreateEnvironment(sand, marker);
                 GameObject car = CreateVehicle(model, paint, wheelNames);
                 CreateCamera(car);
@@ -75,11 +87,18 @@ namespace SandRescue.Editor
                 Reference(display, "vehicle", car.GetComponent<SandRescueVehicleController>());
 
                 // This prefab is a first-test starting point, not a production vehicle release.
-                PrefabUtility.SaveAsPrefabAsset(car, folder + "/SANID_Vehicle01_FirstDrive.prefab");
+                if (PrefabUtility.SaveAsPrefabAsset(car, folder + "/SANID_Vehicle01_FirstDrive.prefab") == null)
+                    throw new InvalidOperationException("Unity did not save the vehicle prefab.");
                 string scenePath = folder + "/SANID_FirstDrive.unity";
-                if (!EditorSceneManager.SaveScene(scene, scenePath))
-                    throw new InvalidOperationException("Unity did not save the test scene. Save the scene manually before closing it.");
+                if (!EditorSceneManager.SaveScene(testScene, scenePath))
+                    throw new InvalidOperationException("Unity did not save the test scene.");
+                sceneSaved = true;
                 AssetDatabase.SaveAssets();
+                // The user already answered the save prompt. Close originals only now,
+                // so old physics/cameras cannot run alongside a successful driving test.
+                foreach (Scene previous in previousScenes)
+                    if (previous.IsValid() && previous.isLoaded && !EditorSceneManager.CloseScene(previous, true))
+                        throw new InvalidOperationException("A previous scene could not be closed. Do not enter Play Mode with multiple test scenes loaded.");
                 Selection.activeGameObject = car;
                 if (SceneView.lastActiveSceneView != null) SceneView.lastActiveSceneView.FrameSelected();
                 EditorUtility.DisplayDialog("First Drive setup created",
@@ -88,8 +107,28 @@ namespace SandRescue.Editor
             catch (Exception error)
             {
                 Debug.LogException(error);
+                string recoveryNote = "A new scene was already saved. Check the Console and open-scene list before entering Play Mode.";
+                if (!sceneSaved)
+                {
+                    try
+                    {
+                        GraphicsSettings.defaultRenderPipeline = previousDefaultPipeline;
+                        QualitySettings.renderPipeline = previousQualityPipeline;
+                        if (previousActive.IsValid() && previousActive.isLoaded)
+                            SceneManager.SetActiveScene(previousActive);
+                        if (testScene.IsValid() && testScene.isLoaded && !EditorSceneManager.CloseScene(testScene, true))
+                            throw new InvalidOperationException("Unity could not close the incomplete temporary scene.");
+                        Selection.activeObject = previousSelection;
+                        recoveryNote = "The incomplete temporary scene was closed. Your original open scenes were kept, and prior pipeline assignments were restored.";
+                    }
+                    catch (Exception recoveryError)
+                    {
+                        Debug.LogException(recoveryError);
+                        recoveryNote = "Automatic cleanup could not finish. Do not enter Play Mode; check the Console before closing or saving any scene.";
+                    }
+                }
                 EditorUtility.DisplayDialog("First Drive setup stopped",
-                    "Setup failed: " + error.Message + "\nCheck the Console. Existing assets were not overwritten; a partial new folder/scene may remain. Do not treat it as a passing test.", "OK");
+                    "Setup failed: " + error.Message + "\n\n" + recoveryNote + "\nPartial generated assets and changed texture import settings are retained; no existing asset files were deleted. This is not a passing driving test.", "OK");
             }
 #endif
         }
