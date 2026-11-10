@@ -7,8 +7,9 @@ While Unity installs, the project now includes an Editor menu command designed t
 1. In GitHub Desktop, select SAND-RESCUE, click Fetch origin, then Pull origin if offered. Do not discard local changes to get an update; report any conflict instead.
 2. In Unity Hub, add the cloned repository folder containing Assets, Packages and ProjectSettings. Open it with Unity 6.0 LTS 6000.0.85f2. Do not create a separate new project.
 3. Let the first package resolution and asset import finish. If Unity asks to enable the New Input System, allow it and restart the Editor if requested. Otherwise set Edit > Project Settings > Player > Other Settings > Active Input Handling to Input System Package (New). Clear actual package/compiler errors before continuing.
-4. Select Tools > SAND RESCUE > Create First Drive Test Scene. Read its local setup dialog. Save any modified open scene when prompted, or cancel to keep working there.
-5. When the new scene opens, press Play and click inside the Game view before using the keyboard.
+4. If any open scene is Untitled, use File > Save As and save it under Assets with a new, unused name, such as Starter_Backup.unity. This is required even for an untouched starter scene: Unity cannot create an additive scene while an unsaved Untitled scene is open. Do not choose Don't Save for this step.
+5. Select Tools > SAND RESCUE > Create First Drive Test Scene. Read its local setup dialog. Save any modified open scene when prompted, or cancel to keep working there.
+6. When the new scene opens, inspect the Console and vehicle orientation first. Only if setup succeeded without errors, press Play and click inside the Game view before using the keyboard.
 
 If the menu is missing, check the Console for compiler errors first. The setup command cannot run until its source and dependencies compile in Unity.
 
@@ -23,6 +24,8 @@ The environment is deliberately simple: a flat 120-metre test surface, six lane 
 If no pipeline is configured, the command creates URP pipeline/renderer assets and assigns them as the default/current-quality pipeline. It does not deliberately replace a configured non-URP pipeline; that case stops with an explanation. It also sets the four vehicle textures' import types, color-space settings and initial maximum size to 1024. It does not change the source image pixels. Generated materials are assigned to the scene copy of the model, not remapped into the original FBX.
 
 ## If setup stops with an error
+
+If Unity says Cannot create a new scene additively with an untitled scene unsaved, close the error dialog and save the original scene with File > Save As under Assets. Then run the command again. Saving first also works with the existing builder version; the latest patch adds an early explanatory check before setup assets are created. No temporary test scene was created in this particular failure, even if the older dialog said one was closed.
 
 The command now builds in a temporary additive scene, keeping your original scenes open during construction. If an exception occurs before the new test scene is saved, it attempts to restore the prior active scene and render-pipeline assignments and close only the incomplete temporary scene. Existing scenes are closed only after the new prefab and scene have been saved, and only after the initial scene-save consent prompt.
 

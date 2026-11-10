@@ -53,9 +53,22 @@ namespace SandRescue.Editor
                 return;
             }
             if (!EditorUtility.DisplayDialog("Create SANID First Drive",
-                "This creates a NEW test scene, prefab and materials. Existing generated files are not overwritten. It updates the four vehicle texture import settings. If no pipeline is active, it also creates URP assets and assigns the default/current-quality pipeline. Save changes in open scenes when prompted. This is an untested setup aid, not a completed mission.", "Create", "Cancel"))
+                "This creates a NEW test scene, prefab and materials. Existing generated files are not overwritten. It updates the four vehicle texture import settings. If no pipeline is active, it also creates URP assets and assigns the default/current-quality pipeline. Save changes in open scenes when prompted. All Untitled scenes must be saved to a file before additive setup can start. This is an untested setup aid, not a completed mission.", "Create", "Cancel"))
                 return;
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+
+            // A clean, never-saved Untitled scene is not covered by the dirty-scene
+            // save prompt. Unity refuses additive creation while it remains open.
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene openScene = SceneManager.GetSceneAt(i);
+                if (openScene.isLoaded && string.IsNullOrEmpty(openScene.path))
+                {
+                    EditorUtility.DisplayDialog("Save your Untitled scene first",
+                        "Unity cannot create an additive test scene while an open scene is Untitled. Use File > Save As to save that scene under Assets with a new, unused name, then run this command again. Do not choose Don't Save for an Untitled scene. No setup assets have been created by this attempt.", "OK");
+                    return;
+                }
+            }
 
             // Keep the original scenes alive until the complete test has been saved.
             Scene previousActive = SceneManager.GetActiveScene();
@@ -116,10 +129,16 @@ namespace SandRescue.Editor
                         QualitySettings.renderPipeline = previousQualityPipeline;
                         if (previousActive.IsValid() && previousActive.isLoaded)
                             SceneManager.SetActiveScene(previousActive);
-                        if (testScene.IsValid() && testScene.isLoaded && !EditorSceneManager.CloseScene(testScene, true))
-                            throw new InvalidOperationException("Unity could not close the incomplete temporary scene.");
+                        bool temporarySceneClosed = false;
+                        if (testScene.IsValid() && testScene.isLoaded)
+                        {
+                            if (!EditorSceneManager.CloseScene(testScene, true))
+                                throw new InvalidOperationException("Unity could not close the incomplete temporary scene.");
+                            temporarySceneClosed = true;
+                        }
                         Selection.activeObject = previousSelection;
-                        recoveryNote = "The incomplete temporary scene was closed. Your original open scenes were kept, and prior pipeline assignments were restored.";
+                        recoveryNote = (temporarySceneClosed ? "The incomplete temporary scene was closed. " : "No temporary scene was open to close. ")
+                            + "Your original open scenes were kept, and prior pipeline assignments were restored.";
                     }
                     catch (Exception recoveryError)
                     {
