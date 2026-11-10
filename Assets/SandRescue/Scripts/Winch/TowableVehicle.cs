@@ -16,7 +16,7 @@ namespace SandRescue
         public void ApplyTowForce(Vector3 direction, float force)
         {
             if (body == null || !IsBeingTowed) return;
-            body.AddForce(direction.normalized * Mathf.Max(0f, force) - body.velocity * resistance, ForceMode.Force);
+            body.AddForce(direction.normalized * Mathf.Max(0f, force) - body.linearVelocity * resistance, ForceMode.Force);
         }
     }
 }

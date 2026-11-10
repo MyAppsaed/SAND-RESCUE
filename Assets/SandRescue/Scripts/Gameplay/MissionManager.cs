@@ -75,7 +75,7 @@ namespace SandRescue
         {
             if (player == null || checkpointManager == null || !checkpointManager.TryGetRespawn(out Vector3 p, out Quaternion r)) return false;
             var body = player.GetComponent<Rigidbody>(); if (body == null) return false;
-            body.position = p; body.rotation = r; body.velocity = Vector3.zero; body.angularVelocity = Vector3.zero; return true;
+            body.position = p; body.rotation = r; body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; return true;
         }
     }
 }

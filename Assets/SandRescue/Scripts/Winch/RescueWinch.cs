@@ -58,7 +58,7 @@ namespace SandRescue
             Vector3 delta = attachmentPoint.position - ConnectedTarget.Body.worldCenterOfMass;
             float distance = delta.magnitude;
             if (distance > CableLength + 0.5f) ConnectedTarget.ApplyTowForce(delta, winchForce);
-            if (distance > maximumCableLength + 1f || ConnectedTarget.Body.velocity.magnitude * ConnectedTarget.Body.mass > breakForce) Detach();
+            if (distance > maximumCableLength + 1f || ConnectedTarget.Body.linearVelocity.magnitude * ConnectedTarget.Body.mass > breakForce) Detach();
         }
     }
 }

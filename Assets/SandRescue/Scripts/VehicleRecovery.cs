@@ -23,7 +23,7 @@ namespace SandRescue
             timer = 0f;
             Vector3 p = transform.position + Vector3.up * liftHeight;
             Quaternion q = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
-            body.position = p; body.rotation = q; body.velocity = Vector3.zero; body.angularVelocity = Vector3.zero;
+            body.position = p; body.rotation = q; body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero;
         }
     }
 }

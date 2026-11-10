@@ -41,7 +41,7 @@ namespace SandRescue
 
         private void Update()
         {
-            SpeedKph = body.velocity.magnitude * 3.6f;
+            SpeedKph = body.linearVelocity.magnitude * 3.6f;
             IsGrounded = false;
             for (int i = 0; i < wheels.Length; i++) if (wheels[i] != null && wheels[i].Grounded) { IsGrounded = true; break; }
             if (input != null && input.Current.RecoverPressed && recovery != null) recovery.Recover();
@@ -51,7 +51,7 @@ namespace SandRescue
         {
             if (body == null || input == null || wheels == null || wheels.Length == 0) return;
             VehicleInputState state = input.Current;
-            float localForwardSpeed = Vector3.Dot(body.velocity, transform.forward) * 3.6f;
+            float localForwardSpeed = Vector3.Dot(body.linearVelocity, transform.forward) * 3.6f;
             float speed01 = Mathf.InverseLerp(0f, maximumForwardSpeedKph, Mathf.Abs(localForwardSpeed));
             float steering = Mathf.Lerp(lowSpeedSteeringAngle, highSpeedSteeringAngle, speed01) * state.Steering;
             var profile = surfaceDetector != null && surfaceDetector.Current != null ? surfaceDetector.Current : null;
