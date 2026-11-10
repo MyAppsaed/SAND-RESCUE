@@ -6,6 +6,8 @@ The repository is a Unity 6.0 project scaffold and has been published to GitHub.
 
 The current release is offline and single-player. The user confirmed online multiplayer as the next stage on 2026-11-10. Establish clear input, simulation authority, presentation, stable-identity and save-data boundaries while completing the offline loop. No networking package or service has been added. See MULTIPLAYER_FOUNDATION.md for the recorded architecture direction and current gaps; the present prototype is not yet multiplayer-ready.
 
+Day and Night modes were requested on 2026-11-10. The recommended first implementation is mission lighting presets with usable nighttime headlights, followed optionally by a continuous cycle. The current test scene is daytime-only; this feature is recorded, not implemented. See DAY_NIGHT_DESIGN.md. In future multiplayer, the shared lighting state belongs to the session authority, not independent client clocks.
+
 ## Current source and art
 
 - Step 1 vehicle foundation and Step 2 gameplay scripts exist under Assets/SandRescue.
