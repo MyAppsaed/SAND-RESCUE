@@ -2,6 +2,10 @@
 
 The repository is a Unity 6.0 project scaffold and has been published to GitHub. The user installed and opened Unity 6.0 LTS 6000.0.85f2 on Windows. ProjectVersion.txt selects that editor without an invented revision hash; Unity writes its exact revision on import. This sandbox still has no Unity Editor or access to the user's local metadata and settings.
 
+## Product direction
+
+The current release is offline and single-player. The user confirmed online multiplayer as the next stage on 2026-11-10. Establish clear input, simulation authority, presentation, stable-identity and save-data boundaries while completing the offline loop. No networking package or service has been added. See MULTIPLAYER_FOUNDATION.md for the recorded architecture direction and current gaps; the present prototype is not yet multiplayer-ready.
+
 ## Current source and art
 
 - Step 1 vehicle foundation and Step 2 gameplay scripts exist under Assets/SandRescue.
