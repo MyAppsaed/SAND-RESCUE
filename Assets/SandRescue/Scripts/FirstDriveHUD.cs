@@ -28,7 +28,7 @@ namespace SandRescue
             if (vehicle != null)
                 GUILayout.Label(string.Format("Speed: {0:0} km/h    Grounded: {1}",
                     vehicle.SpeedKph, vehicle.IsGrounded ? "Yes" : "No"), bodyStyle);
-            GUILayout.Label("Click the Game view to focus keyboard input.\nW/S or arrows: forward/reverse\nA/D or arrows: steer   Space: handbrake\nR: recover   C: brief rear view", bodyStyle);
+            GUILayout.Label("Click the Game view to focus keyboard input.\nW/S or arrows: forward/reverse\nA/D or arrows: steer   Space: handbrake\nR: recover   C: rear view   F: free-look\nIn free-look: hold right mouse and drag; use the wheel to zoom", bodyStyle);
             GUILayout.Label("Driving setup only — no rescue mission, mobile controls or finished branding yet.", bodyStyle);
             GUILayout.EndArea();
         }

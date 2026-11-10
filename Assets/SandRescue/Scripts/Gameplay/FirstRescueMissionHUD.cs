@@ -30,7 +30,7 @@ namespace SandRescue
             GUILayout.Label("FIRST RESCUE — TOW TEST", heading);
             string state = target == null ? "Target: missing" : "Target: " + target.State;
             string cable = winch != null && winch.IsAttached ? "Winch: ATTACHED" : "Winch: ready — press E near target";
-            GUILayout.Label(state + "\n" + cable + "\nE attach   Q detach   T reel in   Y reel out", body);
+            GUILayout.Label(state + "\n" + cable + "\nE attach   Q detach   T reel in   Y reel out\nF free-look   Hold right mouse and drag; wheel zooms", body);
             if (missionManager != null)
             {
                 string missionState = missionManager.IsRunning ? "Mission active" : (missionManager.RewardsIssued ? "MISSION COMPLETE" : "Mission inactive");
