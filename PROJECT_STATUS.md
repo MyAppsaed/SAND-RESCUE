@@ -18,7 +18,7 @@ Day and Night modes were requested on 2026-11-10. The recommended first implemen
 - A SANID silver expedition visual prototype has a body plus four separate wheel meshes with provisional axle pivots.
 - The prototype FBX and its four material maps are under Assets/SandRescue/Art/Vehicles/Vehicle01.
 - A Tools/SAND RESCUE menu command exists to create starter mission assets when run inside Unity; those ScriptableObject assets have not been created here.
-- A separate Create First Drive Test Scene command is prepared to generate the driving rig, camera, URP assets if needed, prefab and flat test scene inside Unity. It has not been run here.
+- A separate Create First Drive Test Scene command generated the validated FirstDrive 4 scene, prefab, materials and flat test environment inside Unity. The successful output is tracked under Assets/SandRescue/Generated/FirstDrive 4.
 - FirstDriveHUD provides a desktop-only smoke-test overlay, not the production/mobile/localized UI.
 - The redundant standalone TextMeshPro package request and the handcrafted incomplete dependency lock were removed. Unity will resolve and regenerate the lock on import.
 - Full FBX forward/up alignment was corrected after the user reported a sideways vehicle and Wheel_RL radius error.
@@ -32,20 +32,19 @@ Day and Night modes were requested on 2026-11-10. The recommended first implemen
 - Actual model preview inspected.
 - Targeted source checks and git diff --check.
 - A C# grammar parser checked 37 source files without syntax errors; this is not a Unity API/compiler check.
-- The user's screenshot showed no Console errors before running the first-drive command, and the command executed on the user's machine. Setup then stopped with Unexpected imported wheel radius for Wheel_RL: 0.1965754. This was a setup failure, not a passing drive test.
-- After the alignment correction, numerical tests using actual mesh coordinates passed 15 rotation/scale cases with corrected wheel radii approximately 0.45 m. Unity verification is still pending.
+- The user's first setup attempt stopped with Unexpected imported wheel radius for Wheel_RL: 0.1965754. After the alignment correction and active-scene fix, the user successfully generated the FirstDrive 4 scene in Unity.
+- In the user's Play Mode smoke test, the vehicle stayed upright, W drove toward the visible front, A/D steered correctly, and no red Console errors appeared. Recovery with R still needs a focused test while the vehicle is tipped or stuck.
 
 ## Not completed or tested
 
-- Repeat Unity compilation/import after the latest patches; the user's local generated metadata and resolved package lock are not yet captured in this sandbox.
-- The corrected first-drive generation and scene failure recovery in Unity.
-- Unity Play Mode, vehicle driving, safe-zone events or winch dynamics.
+- Unity Play Mode vehicle driving has passed its initial forward/steering smoke test; recovery, safe-zone events and winch dynamics remain untested or incomplete.
+- A screenshot-level inspection of the generated scene and exact wheel alignment remains useful before mission assembly.
 - Completed scenes/prefabs, URP pipeline asset or saved Inspector assignments.
 - Exact SANID decal replacement, wheel rotation appearance, final collision hulls or LODs.
 - Unity Localization String Tables, full Arabic RTL layout or Arabic shaping.
 - Persistent coins/XP, save system, garage or upgrades (Step 3 remains deferred).
 - Android/iOS export, profiling or physical-device tests.
 
-Previous balanced-brace and syntax checks were not Unity compilation. The next validation gate is rerunning the corrected setup in the user's actual project and inspecting the Console before driving. Preserve all Unity-generated local changes when pulling code; do not discard them to avoid a conflict.
+Previous balanced-brace and syntax checks were not Unity compilation. The next validation gate is the first rescue mission loop: create the starter mission assets, place a stranded target and safe zone, then test winch attachment and tow completion in the generated scene. Preserve all Unity-generated local changes when pulling code; do not discard them to avoid a conflict.
 
 See FIRST_DRIVE_GUIDE.md for the first-drive command. Docs/Vehicle01/START_HERE.md and STEP2_SETUP.md contain model and mission setup notes.
